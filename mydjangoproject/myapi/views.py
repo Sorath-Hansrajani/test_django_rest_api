@@ -22,11 +22,6 @@ class PersonViewSet(viewsets.ModelViewSet):
     def person_list(request):
         if request.method == 'GET':
             persons = Person.objects.all()
-
-            title = request.query_params.get('title', None)
-            if title is not None:
-                persons = persons.filter(title__icontains=title)
-
             persons_serializer = PersonSerializer(persons, many=True)
             return JsonResponse(persons_serializer.data, safe=False)
             # 'safe=False' for objects serialization
@@ -36,11 +31,10 @@ class PersonViewSet(viewsets.ModelViewSet):
             person_serializer = PersonSerializer(data=person_data)
             if person_serializer.is_valid():
                 person_serializer.save()
-                print(person_serializer.data['image_url'])
-
                 if not check_face_exist(person_serializer.data['image_url']):
                     person_data.delete()
-                    return JsonResponse(person_serializer.errors, {'message': '{} Provide image with 1 face!'})
+                    return JsonResponse(person_serializer.errors, {'message': '{} Provide image with 1 face!'},
+                                        status=status.HTTP_406_NOT_ACCEPTABLE)
                 return JsonResponse(person_serializer.data, status=status.HTTP_201_CREATED)
             return JsonResponse(person_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
