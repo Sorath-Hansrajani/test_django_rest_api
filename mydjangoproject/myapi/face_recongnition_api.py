@@ -1,4 +1,6 @@
 import face_recognition
+import cv2
+from django.conf import settings
 
 
 def check_face_exist(test_image):
@@ -9,3 +11,4 @@ def check_face_exist(test_image):
     else:
         check = 1
     return check
+
